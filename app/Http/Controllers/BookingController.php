@@ -1,8 +1,6 @@
 <?php
 
 namespace App\Http\Controllers;
-
-use App\Models\Booking;
 use Exception;
 use Illuminate\Http\Request;
 use App\Services\BookingService;
@@ -16,6 +14,7 @@ class BookingController extends Controller
      * @return \Illuminate\Http\Response
      */
     protected $bookingService;
+
     public function __construct(BookingService $bookingService)
     {
         $this->bookingService = $bookingService;
@@ -161,7 +160,7 @@ class BookingController extends Controller
     public function freeDays(Request $request)
     {
         try {
-            $inputs  = $request ;
+            $inputs  = $request;
             $bookingDays = $this->bookingService->freeDays($inputs);
             if ($bookingDays) {
                 return Response::json(
