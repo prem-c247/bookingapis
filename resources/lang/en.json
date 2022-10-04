@@ -1,0 +1,9 @@
+{
+    "booking_list": "Booking List",
+    "s_no": "S.No.",
+    "purpose":"Booking Purpose",
+    "start_date": "Start Date",
+    "end_date": "End Date",
+    "no_booking":"No Booking Found",
+    "add_booking":"Add Booking"
+}
