@@ -54,7 +54,7 @@ class BookingService
      */
     public function freeDays($inputs)
     {
-        return  $this->bookingModal->whereNotBetween('created_at', [$inputs->start_date, $inputs->end_date])->get();
+        return  $this->bookingModal->whereNotBetween('created_at', [$inputs['start_date'], $inputs['end_date']])->get();
     }
 
     

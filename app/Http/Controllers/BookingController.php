@@ -112,6 +112,18 @@ class BookingController extends Controller
      */
     public function freeDays(Request $request)
     {
+         // validated request
+          $validator = \Validator::make(
+            $request->all(),
+            [
+                'start_date' => ['required','date:yyyy-mm-dd'],
+                'end_date' => ['required','date:yyyy-mm-dd'],
+            ] );
+      
+            if ($validator->fails()) {
+                return response()->json(['status' => 'error','error' => $validator->errors()],203);
+            }
+
        try {
             $data = [
                   'start_date'=>$request->start_date,
@@ -125,6 +137,7 @@ class BookingController extends Controller
             return \Response::json([
                 'status' => 'success','data' => $bookingDays,'message' => $message
             ],200 );
+            
         } catch (\Exception $exception) {
             \Log::error($exception->getMessage());
             return \Response::json(
