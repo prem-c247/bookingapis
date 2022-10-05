@@ -1,16 +1,14 @@
 <?php
 
 namespace App\Services;
-
 use App\Models\Booking;
 
 class BookingService
 {
-
-   /**
-     * Return result from the modal.
-     *
-     * @return \Illuminate\Http\Response
+  
+  /**
+     *  Initializing the Booking Modal
+     * 
      */
     protected $bookingModal;
 
@@ -20,8 +18,8 @@ class BookingService
     }
 
    /**
-     *TO get  data from table .
-     * @param $user_id current login user id
+     *  Return Result of  All Bookings ..
+     *
      * @return \Illuminate\Http\Response
      */
     public function getBooking()
@@ -29,9 +27,9 @@ class BookingService
         return  $this->bookingModal->orderBy('id', 'DESC')->get();
     }
 
-   /**
-     *store data in table .
-     * @param $user_id current login user id
+    /**
+     *  Store Data of booking ..
+     *
      * @return \Illuminate\Http\Response
      */
     public function storeBooking($data)
@@ -39,9 +37,9 @@ class BookingService
       return  $this->bookingModal->updateOrCreate($data);
     }
 
-    /**
-     *get data from table .
-     * @param $user_id current login user id
+   /**
+     *  Return Result of  Booking Days ..
+     *
      * @return \Illuminate\Http\Response
      */
     public function bookingDays()
@@ -49,9 +47,9 @@ class BookingService
         return  $this->bookingModal->select('start_date','end_date')->get();
     }
 
-    /**
-     *get data from table .
-     * @param $user_id current login user id
+   /**
+     *  Return Result of  Free Days ..
+     *
      * @return \Illuminate\Http\Response
      */
     public function freeDays($inputs)

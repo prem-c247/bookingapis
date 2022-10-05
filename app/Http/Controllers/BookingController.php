@@ -5,13 +5,11 @@ use Exception;
 use Illuminate\Http\Request;
 use App\Services\BookingService;
 
-
 class BookingController extends Controller
 {
     /**
-     * Return result from the service.
-     *
-     * @return \Illuminate\Http\Response
+     *  Initializing the Booking Service
+     * 
      */
     protected $bookingService;
 
@@ -20,9 +18,9 @@ class BookingController extends Controller
         $this->bookingService = $bookingService;
     }
 
-    /**
-     *to get all data.
-     * @param $user_id current login user id
+   /**
+     * Return Result of All Bookings 
+     *
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request)
@@ -30,13 +28,7 @@ class BookingController extends Controller
         try {
             if ($request->is('api/*')) {
                 $bookings = $this->bookingService->getBooking();
-                return \Response::json(
-                    [
-                        'status' => 'success',
-                        'data' => $bookings,
-                    ],
-                    201
-                );
+                return \Response::json(['status' => 'success','data' => $bookings],200);
             } else {
                 $bookingData = $this->bookingService->getBooking();
                 return view('bookings.index', compact('bookingData'));
@@ -44,18 +36,13 @@ class BookingController extends Controller
         } catch (\Exception $exception) {
             \Log::error($exception->getMessage());
             return \Response::json(
-                [
-                    'status' => 'error',
-                    'message' => $exception->getMessage(),
-                ],
-                400
-            );
+                ['status' => 'error','message' => $exception->getMessage(),],501);
         }
     }
 
-    /**
-     *store booking data
-     * @param $user_id current login user id
+   /**
+     * Store Result of Booking 
+     *
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -65,8 +52,8 @@ class BookingController extends Controller
             $request->all(),
             [
                 'purpose' => ['required', 'string', 'max:50'],
-                'start_date' => ['required', 'unique:bookings,start_date'],
-                'end_date' => ['required','after_or_equal:start_date'],
+                'start_date' => ['required','date:yyyy-mm-dd','unique:bookings,start_date'],
+                'end_date' => ['required','date:yyyy-mm-dd', 'after_or_equal:start_date'],
             ],
             [
                 'purpose.required' => "Please Enter Purpose",
@@ -78,100 +65,70 @@ class BookingController extends Controller
         );
       
             if ($validator->fails()) {
-                return response()->json([
-                    'status' => 'error',
-                    'error' => $validator->errors(),
-                ],
-                    400);
+                return response()->json(['status' => 'error','error' => $validator->errors()],203);
             }
-      
-        try {
+       try {
             $data = [
                 'purpose'=>$request->purpose,
                 'start_date'=>$request->start_date,
                 'end_date'=>$request->end_date
             ];
-            $this->bookingService->storeBooking($data);
+           return  $this->bookingService->storeBooking($data);
             return \Response::json(
-                [
-                    'status' => 'success',
-                    'message' => 'Booking created successfully',
-                ],
-                200
-            );
+                ['status' => 'success','message' => 'Booking created successfully'],201);
         } catch (\Exception $exception) {
             \Log::error($exception->getMessage());
             return \Response::json(
-                [
-                    'status' => 'error',
-                    'message' => $exception->getMessage(),
-                ],
-                400
-            );
+                ['status' => 'error','message' => $exception->getMessage(),],501);
         }
     }
 
-    /**
-     *to get busy days.
-     * @param $user_id current login user id
+   /**
+     *  Return Result of  Booking Days ..
+     *
      * @return \Illuminate\Http\Response
      */
     public function bookingDays()
     {
         try {
             $bookingDays = $this->bookingService->bookingDays();
-           
+            $message = 'Busy Days Get Successfully';
             if (count($bookingDays) == 0) {
-                $bookingDays =  'No Booking Days Found';
+                $message =  'No Booking Days Found';
             }
-
             return \Response::json(
-                [
-                    'status' => 'success',
-                    'data' => $bookingDays,
-                ],
-                201
-            );
+                ['status' => 'success','data' => $bookingDays,'message' => $message],200);
         } catch (\Exception $exception) {
             \Log::error($exception->getMessage());
             return \Response::json(
-                [
-                    'status' => 'error',
-                    'message' => $exception->getMessage(),
-                ],
-                400
-            );
+                ['status' => 'error',  'message' => $exception->getMessage(),],501 );
         }
     }
 
-    /**
-     *to get free days.
-     * @param $user_id current login user id
+   /**
+     *  Return Result of Free Days List ..
+     *
      * @return \Illuminate\Http\Response
      */
     public function freeDays(Request $request)
     {
-        try {
-            $inputs  = $request;
-            $bookingDays = $this->bookingService->freeDays($inputs);
+       try {
+            $data = [
+                  'start_date'=>$request->start_date,
+                  'end_date'=>$request->end_date
+                ];
+            $bookingDays = $this->bookingService->freeDays($data);
+            $message = 'Free Booking Get Successfully';
             if (count($bookingDays) == 0) {
-                $bookingDays =  'No Free Days Found';
+                $message =  'No Free Days Found';
             }
-            return \Response::json(
-                [
-                    'status' => 'success',
-                    'data' => $bookingDays,
-                ],
-                201
-            );
+            return \Response::json([
+                'status' => 'success','data' => $bookingDays,'message' => $message
+            ],200 );
         } catch (\Exception $exception) {
             \Log::error($exception->getMessage());
             return \Response::json(
-                [
-                    'status' => 'error',
-                    'message' => $exception->getMessage(),
-                ],
-                400
+                ['status' => 'error','message' => $exception->getMessage()],501
             );
         }
     }
