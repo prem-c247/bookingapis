@@ -8,13 +8,25 @@ class BookingService
 {
 
    /**
+     * Return result from the modal.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    protected $bookingModal;
+
+    public function __construct(Booking $bookingModal)
+    {
+        $this->bookingModal = $bookingModal;
+    }
+
+   /**
      *TO get  data from table .
      * @param $user_id current login user id
      * @return \Illuminate\Http\Response
      */
     public function getBooking()
     {
-        return Booking::orderBy('id', 'DESC')->get();
+        return  $this->bookingModal->orderBy('id', 'DESC')->get();
     }
 
    /**
@@ -24,7 +36,7 @@ class BookingService
      */
     public function storeBooking($data)
     {
-      return  Booking::updateOrCreate($data);
+      return  $this->bookingModal->updateOrCreate($data);
     }
 
     /**
@@ -34,7 +46,7 @@ class BookingService
      */
     public function bookingDays()
     {
-        return  Booking::select('start_date','end_date')->get();
+        return  $this->bookingModal->select('start_date','end_date')->get();
     }
 
     /**
@@ -44,7 +56,7 @@ class BookingService
      */
     public function freeDays($inputs)
     {
-        return  Booking::whereNotBetween('created_at', [$inputs->start_date, $inputs->end_date])->get();
+        return  $this->bookingModal->whereNotBetween('created_at', [$inputs->start_date, $inputs->end_date])->get();
     }
 
     

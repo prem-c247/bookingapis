@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 use Exception;
 use Illuminate\Http\Request;
 use App\Services\BookingService;
-use Illuminate\Support\Facades\{Log,Response,Validator};
+
 
 class BookingController extends Controller
 {
@@ -30,8 +30,9 @@ class BookingController extends Controller
         try {
             if ($request->is('api/*')) {
                 $bookings = $this->bookingService->getBooking();
-                return Response::json(
+                return \Response::json(
                     [
+                        'status' => 'success',
                         'data' => $bookings,
                     ],
                     201
@@ -40,10 +41,10 @@ class BookingController extends Controller
                 $bookingData = $this->bookingService->getBooking();
                 return view('bookings.index', compact('bookingData'));
             }
-        } catch (Exception $exception) {
-            return Response::json(
+        } catch (\Exception $exception) {
+            \Log::error($exception->getMessage());
+            return \Response::json(
                 [
-                    Log::error($exception->getMessage()),
                     'status' => 'error',
                     'message' => $exception->getMessage(),
                 ],
@@ -60,7 +61,7 @@ class BookingController extends Controller
     public function store(Request $request)
     {
         // validated request
-        $validator = Validator::make(
+        $validator = \Validator::make(
             $request->all(),
             [
                 'purpose' => ['required', 'string', 'max:50'],
@@ -74,40 +75,33 @@ class BookingController extends Controller
                 'end_date.required' => 'Please Select End Date',
             ]
         );
-        if ($request->is('api/*')) {
-            // if any error return back request with input errors
-            if ($validator->fails()) {
-                return Response::json(
-                    [
-                        'status' => 'error',
-                        'error' => $validator->errors(),
-                    ],
-                    400
-                );
-            }
-        } else {
+      
             if ($validator->fails()) {
                 return response()->json([
                     'status' => 'error',
                     'error' => $validator->errors(),
-                ]);
+                ],
+                    400);
             }
-        }
-
+      
         try {
-            $inputs = $validator->validated();
-            $this->bookingService->storeBooking($inputs);
-            return Response::json(
+            $data = [
+                'purpose'=>$request->purpose,
+                'start_date'=>$request->start_date,
+                'end_date'=>$request->end_date
+            ];
+            $this->bookingService->storeBooking($data);
+            return \Response::json(
                 [
                     'status' => 'success',
                     'message' => 'Booking created successfully',
                 ],
                 200
             );
-        } catch (Exception $exception) {
-            return Response::json(
+        } catch (\Exception $exception) {
+            \Log::error($exception->getMessage());
+            return \Response::json(
                 [
-                    Log::error($exception->getMessage()),
                     'status' => 'error',
                     'message' => $exception->getMessage(),
                 ],
@@ -125,25 +119,21 @@ class BookingController extends Controller
     {
         try {
             $bookingDays = $this->bookingService->bookingDays();
-            if ($bookingDays) {
-                return Response::json(
-                    [
-                        'data' => $bookingDays,
-                    ],
-                    201
-                );
-            } else {
-                return Response::json(
-                    [
-                        'message' => 'No Booking Days Found',
-                    ],
-                    400
-                );
+            if (!empty($bookingDays)) {
+                $bookingDays =  'No Booking Days Found';
             }
-        } catch (Exception $exception) {
-            return Response::json(
+
+            return \Response::json(
                 [
-                    Log::error($exception->getMessage()),
+                    'status' => 'success',
+                    'data' => $bookingDays,
+                ],
+                201
+            );
+        } catch (\Exception $exception) {
+            \Log::error($exception->getMessage());
+            return \Response::json(
+                [
                     'status' => 'error',
                     'message' => $exception->getMessage(),
                 ],
@@ -162,25 +152,21 @@ class BookingController extends Controller
         try {
             $inputs  = $request;
             $bookingDays = $this->bookingService->freeDays($inputs);
-            if ($bookingDays) {
-                return Response::json(
-                    [
-                        'data' => $bookingDays,
-                    ],
-                    201
-                );
-            } else {
-                return Response::json(
-                    [
-                        'message' => 'No Free Days Found',
-                    ],
-                    400
-                );
+            if (!empty($bookingDays)) {
+                $bookingDays =  'No Free Days Found';
             }
-        } catch (Exception $exception) {
-            return Response::json(
+
+            return \Response::json(
                 [
-                    Log::error($exception->getMessage()),
+                    'status' => 'success',
+                    'data' => $bookingDays,
+                ],
+                201
+            );
+        } catch (\Exception $exception) {
+            \Log::error($exception->getMessage());
+            return \Response::json(
+                [
                     'status' => 'error',
                     'message' => $exception->getMessage(),
                 ],
