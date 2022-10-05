@@ -66,13 +66,14 @@ class BookingController extends Controller
             [
                 'purpose' => ['required', 'string', 'max:50'],
                 'start_date' => ['required', 'unique:bookings,start_date'],
-                'end_date' => ['required'],
+                'end_date' => ['required','after_or_equal:start_date'],
             ],
             [
                 'purpose.required' => "Please Enter Purpose",
                 'start_date.unique' => 'Booking Date Already Busy',
                 'start_date.required' => 'Please Select Start Date',
                 'end_date.required' => 'Please Select End Date',
+                'end_date.after_or_equal'=> 'End Date Should Be Greater Or Equal to Start Date'
             ]
         );
       
@@ -119,7 +120,8 @@ class BookingController extends Controller
     {
         try {
             $bookingDays = $this->bookingService->bookingDays();
-            if (!empty($bookingDays)) {
+           
+            if (count($bookingDays) == 0) {
                 $bookingDays =  'No Booking Days Found';
             }
 
@@ -152,10 +154,9 @@ class BookingController extends Controller
         try {
             $inputs  = $request;
             $bookingDays = $this->bookingService->freeDays($inputs);
-            if (!empty($bookingDays)) {
+            if (count($bookingDays) == 0) {
                 $bookingDays =  'No Free Days Found';
             }
-
             return \Response::json(
                 [
                     'status' => 'success',
