@@ -41,7 +41,7 @@ class BookingController extends Controller
     }
 
    /**
-     * Store Result of Booking 
+     * Store Result of Booking or check if the booking is not already exists
      *
      * @return \Illuminate\Http\Response
      */
@@ -64,18 +64,18 @@ class BookingController extends Controller
             ]
         );
       
-            if ($validator->fails()) {
-                return response()->json(['status' => 'error','error' => $validator->errors()],203);
-            }
+        if ($validator->fails()) {
+            return response()->json(['status' => 'error','error' => $validator->errors()],203);
+        }
        try {
             $data = [
                 'purpose'=>$request->purpose,
                 'start_date'=>$request->start_date,
                 'end_date'=>$request->end_date
             ];
-           return  $this->bookingService->storeBooking($data);
+            $bookedData = $this->bookingService->storeBooking($data);
             return \Response::json(
-                ['status' => 'success','message' => 'Booking created successfully'],201);
+                ['status' => 'success','message' => 'Booking created successfully','data' => $bookedData],201);
         } catch (\Exception $exception) {
             \Log::error($exception->getMessage());
             return \Response::json(
@@ -145,6 +145,4 @@ class BookingController extends Controller
             );
         }
     }
-
-  
 }
